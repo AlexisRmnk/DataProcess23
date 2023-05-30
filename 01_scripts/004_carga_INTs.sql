@@ -1,0 +1,202 @@
+/* Creación de procedimientos para la carga desde STG >> INT para
+ todas las dimensiones y Fact */
+USE DW_COMERCIAL;
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- SPs para carga INT DIMS
+
+CREATE PROCEDURE sp_carga_int_dim_producto
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_PRODUCTO]
+
+	INSERT INTO [INT_DIM_PRODUCTO] 
+	( 
+		COD_PRODUCTO,
+		DESC_PRODUCTO
+	)
+	SELECT 
+		-- no hago un CAST/CONVERT porque el tipo y tamaño de dato es el mismo
+		COD_PRODUCTO, 
+		DESC_PRODUCTO
+	FROM STG_DIM_PRODUCTO 
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_int_dim_categoria
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_CATEGORIA]
+
+	INSERT INTO [INT_DIM_CATEGORIA] 
+	( 
+		COD_CATEGORIA,
+		DESC_CATEGORIA
+	)
+	SELECT 
+		-- no hago un CAST/CONVERT porque el tipo y tamaño de dato es el mismo
+		COD_CATEGORIA, 
+		DESC_CATEGORIA
+	FROM STG_DIM_CATEGORIA 
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_int_dim_pais
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_PAIS]
+
+	INSERT INTO [INT_DIM_PAIS] 
+	( 
+		COD_PAIS,
+		DESC_PAIS
+	)
+	SELECT 
+		CAST(COD_PAIS AS VARCHAR(3)), 
+		DESC_PAIS
+	FROM STG_DIM_PAIS 
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_int_dim_sucursal
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_SUCURSAL]
+
+	INSERT INTO [INT_DIM_SUCURSAL] 
+	( 
+		COD_SUCURSAL,
+		DESC_SUCURSAL
+	)
+	SELECT 
+		-- no hago un CAST/CONVERT porque el tipo y tamaño de dato es el mismo
+		COD_SUCURSAL, 
+		DESC_SUCURSAL
+	FROM STG_DIM_SUCURSAL 
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_int_dim_cliente
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_CLIENTE]
+
+	INSERT INTO [INT_DIM_CLIENTE] 
+	(
+		COD_CLIENTE,
+		NOMBRE,
+		APELLIDO
+	)
+	SELECT 
+		COD_CLIENTE,
+		dbo.fn_extrae_primeros_nombres(DESC_CLIENTE) AS NOMBRE,
+ 		dbo.fn_extrae_apellido(DESC_CLIENTE) AS APELLIDO
+
+	FROM STG_DIM_CLIENTE 
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_int_dim_vendedor
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [INT_DIM_VENDEDOR]
+
+	INSERT INTO [INT_DIM_VENDEDOR] 
+	(
+		COD_VENDEDOR,
+		NOMBRE,
+		APELLIDO
+	)
+	SELECT 
+		COD_VENDEDOR,
+		dbo.fn_extrae_primeros_nombres(DESC_VENDEDOR) AS NOMBRE,
+ 		dbo.fn_extrae_apellido(DESC_VENDEDOR) AS APELLIDO
+
+	FROM STG_DIM_VENDEDOR 
+END
+GO
+
+
+-- SP para cargar la Fact Ventas
+CREATE PROCEDURE sp_carga_int_fact_ventas
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE INT_FACT_VENTAS
+
+	INSERT INTO INT_FACT_VENTAS
+	(
+		[COD_PRODUCTO]
+		,[COD_CATEGORIA]
+		,[COD_CLIENTE]
+		,[COD_PAIS]
+		,[COD_VENDEDOR]
+		,[COD_SUCURSAL]
+		,[Fecha]
+		,[CANTIDAD_VENDIDA]
+		,[MONTO_VENDIDO]
+		,[PRECIO]
+		,[COMISION_COMERCIAL]
+	)
+	SELECT 
+		CAST([COD_PRODUCTO] AS VARCHAR(100)) 
+		,CAST([COD_CATEGORIA] AS VARCHAR(100))
+		,CAST([COD_CLIENTE] AS VARCHAR(100))
+		,CAST([COD_PAIS] AS VARCHAR(100))
+		,CAST([COD_VENDEDOR] AS VARCHAR(100))
+		,CAST([COD_SUCURSAL] AS VARCHAR(100))
+		,CAST([Fecha] AS SMALLDATETIME)
+		,CAST([Cantidad_Vendida] AS DECIMAL(18, 2))
+		,CAST([Monto_Vendido] AS DECIMAL(18, 2))
+		,CAST([Precio] AS DECIMAL(18, 2))
+		,CAST([Comision_Comercial] AS DECIMAL(18, 2))
+	FROM STG_FACT_VENTAS
+END
+GO
+
+
+-- Carga de INT DIM
+EXECUTE dbo.sp_carga_int_dim_categoria;
+EXECUTE dbo.sp_carga_int_dim_cliente;
+EXECUTE dbo.sp_carga_int_dim_pais;
+EXECUTE dbo.sp_carga_int_dim_producto;
+EXECUTE dbo.sp_carga_int_dim_sucursal;
+EXECUTE dbo.sp_carga_int_dim_vendedor;
+
+-- Control
+SELECT * FROM INT_DIM_CATEGORIA;
+SELECT * FROM INT_DIM_CLIENTE;
+SELECT * FROM INT_DIM_PAIS;
+SELECT * FROM INT_DIM_PRODUCTO;
+SELECT * FROM INT_DIM_SUCURSAL;
+SELECT * FROM INT_DIM_VENDEDOR;
+
+
+-- Carga de STG FACT
+EXECUTE dbo.sp_carga_int_fact_ventas;
+-- Control
+SELECT TOP (100) * FROM INT_FACT_VENTAS;

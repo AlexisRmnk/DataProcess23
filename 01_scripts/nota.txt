@@ -1,0 +1,3 @@
+Se recomienda cambiar el tipo de dato en la tabla raw (BD_COMERCIAL) de float a DECIMAL(18,6) para no tener problemas de datos al pasar a las STG.
+
+Ver script 000_auxiliares.sql

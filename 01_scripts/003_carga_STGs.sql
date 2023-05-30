@@ -1,0 +1,143 @@
+/* Creacion de procedimientos para la carga desde RAW >> STG para
+ todas las dimensiones y Fact */
+USE DW_COMERCIAL;
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- SPs para carga STG DIMS
+
+CREATE PROCEDURE sp_carga_stg_dim_categoria
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_CATEGORIA]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_CATEGORIA]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Categoria]
+
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_stg_dim_cliente
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_CLIENTE]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_CLIENTE]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Cliente]
+
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_stg_dim_pais
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_PAIS]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_PAIS]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Pais]
+
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_stg_dim_producto
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_PRODUCTO]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_PRODUCTO]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Producto]
+
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_stg_dim_sucursal
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_SUCURSAL]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_SUCURSAL]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Sucursal]
+
+END
+GO
+
+
+CREATE PROCEDURE sp_carga_stg_dim_vendedor
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_DIM_VENDEDOR]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_DIM_VENDEDOR]
+	SELECT * FROM [DB_COMERCIAL].dbo.[Vendedor]
+
+END
+GO
+
+
+
+CREATE PROCEDURE sp_carga_stg_fact_ventas
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	TRUNCATE TABLE [DW_COMERCIAL].dbo.[STG_FACT_VENTAS]
+
+	INSERT INTO [DW_COMERCIAL].dbo.[STG_FACT_VENTAS]
+	SELECT
+		[COD_PRODUCTO]
+		,[COD_CATEGORIA]
+		,[COD_CLIENTE]
+		,[COD_PAIS]
+		,[COD_VENDEDOR]
+		,[COD_SUCURSAL]
+		,[Fecha]
+		,[Cantidad_Vendida]
+		,[Monto_Vendido]
+		,[Precio]
+		,[Comision_Comercial]
+	FROM [DB_COMERCIAL].dbo.[Ventas]
+
+END
+GO
+
+
+-- Carga de STG DIM
+EXECUTE dbo.sp_carga_stg_dim_categoria;
+EXECUTE dbo.sp_carga_stg_dim_cliente;
+EXECUTE dbo.sp_carga_stg_dim_pais;
+EXECUTE dbo.sp_carga_stg_dim_producto;
+EXECUTE dbo.sp_carga_stg_dim_sucursal;
+EXECUTE dbo.sp_carga_stg_dim_vendedor;
+
+-- Control
+SELECT * FROM STG_DIM_CATEGORIA;
+SELECT * FROM STG_DIM_CLIENTE;
+SELECT * FROM STG_DIM_PAIS;
+SELECT * FROM STG_DIM_PRODUCTO;
+SELECT * FROM STG_DIM_SUCURSAL;
+SELECT * FROM STG_DIM_VENDEDOR;
+
+-- Carga de STG FACT
+EXECUTE dbo.sp_carga_stg_fact_ventas;
+-- Control
+SELECT TOP (100) * FROM STG_FACT_VENTAS;

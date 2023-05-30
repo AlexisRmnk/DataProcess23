@@ -1,0 +1,116 @@
+// https://dbdiagram.io/d/64385c9d8615191cfa8dc47f
+
+Project Ch_03_Class_04 {
+  database_type: 'SQL Server'
+  Note: 'Integrador DW-COMERCIAL'
+  Author: 'Alexis Romaniuk'
+}
+
+Table FACT_VENTAS as F_V {
+  PRODUCTO_KEY int
+	CATEGORIA_KEY int
+  CLIENTE_KEY int
+  PAIS_KEY int
+  VENDEDOR_KEY int
+	SUCURSAL_KEY int
+	TIEMPO_KEY smalldatetime
+	CANTIDAD_VENDIDA decimal(18,2)
+	MONTO_VENDIDO decimal(18,2)
+	PRECIO decimal(18,2)
+	COMISION_COMERCIAL decimal(18,2)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+
+  indexes {
+    (PRODUCTO_KEY, CATEGORIA_KEY, CLIENTE_KEY, PAIS_KEY, VENDEDOR_KEY, SUCURSAL_KEY, TIEMPO_KEY) [pk] // composite primary key
+  }
+}
+
+// relationships (Foreign keys)
+Ref: F_V.PRODUCTO_KEY > D_PR.PRODUCTO_KEY
+Ref: F_V.CATEGORIA_KEY > D_CA.CATEGORIA_KEY
+Ref: F_V.CLIENTE_KEY > D_CL.CLIENTE_KEY
+Ref: F_V.PAIS_KEY > D_PA.PAIS_KEY
+Ref: F_V.VENDEDOR_KEY > D_V.VENDEDOR_KEY
+Ref: F_V.SUCURSAL_KEY > D_S.SUCURSAL_KEY
+Ref: F_V.TIEMPO_KEY > D_T.TIEMPO_KEY
+
+Table DIM_TIEMPO as D_T{
+  TIEMPO_KEY smalldatetime [pk]
+  ANIO int
+  MES_NRO int
+	MES_NOMBRE varchar(15)
+	SEMESTRE int
+	TRIMESTRE int
+	SEMANA_ANIO int
+	SEMANA_NRO_MES int
+	DIA int
+	DIA_NOMBRE varchar(20)
+	DIA_SEMANA_NRO int
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_PRODUCTO as D_PR {
+  PRODUCTO_KEY int [pk, increment]
+  COD_PRODUCTO varchar(500)
+	DESC_PRODUCTO varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_SUCURSAL as D_S {
+  SUCURSAL_KEY int [pk, increment]
+  COD_SUCURSAL varchar(500)
+	DESC_SUCURSAL varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_CATEGORIA as D_CA {
+  CATEGORIA_KEY int [pk, increment]
+  COD_CATEGORIA varchar(500)
+	DESC_CATEGORIA varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_PAIS as D_PA {
+  PAIS_KEY int [pk, increment]
+  COD_PAIS varchar(3)
+	DESC_PAIS varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_VENDEDOR as D_V {
+  VENDEDOR_KEY int [pk, increment]
+  COD_VENDEDOR varchar(500)
+	NOMBRE varchar(500)
+	APELLIDO varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
+
+Table DIM_CLIENTE as D_CL {
+  CLIENTE_KEY int [pk, increment]
+  COD_CLIENTE varchar(500)
+	NOMBRE varchar(500)
+	APELLIDO varchar(500)
+	FECHA_ALTA datetime [not null, default: 'GETDATE()']
+	USUARIO_ALTA varchar(500) [not null, default: 'SYSTEM_USER']
+	FECHA_UPDATE datetime [Note: 'Usa un trigger para su actualizacion']
+	USUARIO_UPDATE varchar(500) [Note: 'Usa un trigger para su actualizacion']
+}
